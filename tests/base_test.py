@@ -43,6 +43,34 @@ class BaseTest(unittest.TestCase):
         cls.driver = webdriver.Chrome(options=chrome_options)
         cls.driver.implicitly_wait(10)
         
+        cls._create_test_user_for_login()
+    
+    @classmethod
+    def _create_test_user_for_login(cls):
+        """Buat user test untuk login"""
+        import bcrypt
+        try:
+            conn = pymysql.connect(
+                host=cls.DB_HOST,
+                user=cls.DB_USER,
+                password=cls.DB_PASS,
+                database=cls.DB_NAME
+            )
+            cursor = conn.cursor()
+            
+            cursor.execute("DELETE FROM users WHERE username = 'testuser_login'")
+            
+            password_hash = bcrypt.hashpw('Test@123'.encode(), bcrypt.gensalt()).decode()
+            cursor.execute(
+                "INSERT INTO users (username, name, email, password) VALUES (%s, %s, %s, %s)",
+                ('testuser_login', 'Test User Login', 'testlogin@example.com', password_hash)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Warning: Could not create test user: {e}")
+        
     @classmethod
     def tearDownClass(cls):
         """Cleanup setelah semua test selesai"""

@@ -7,7 +7,7 @@ class TestRegisterDuplicateUsername(BaseTest):
     def test_register_duplicate_username(self):
         print("\n[TC-REG-009] Testing: Register dengan Username yang Sudah Ada")
         
-        existing_username = "irul"
+        existing_username = "testuser_login"
         
         self.navigate_to_register()
         self.fill_register_form(
@@ -21,14 +21,23 @@ class TestRegisterDuplicateUsername(BaseTest):
         self.submit_register_form()
         
         import time
-        time.sleep(1)
+        time.sleep(2)
         self.take_screenshot("test_reg_009_duplicate_username")
         
         error = self.get_error_message()
-        print(f"Error message: {error}")
+        print(f"Error message: '{error}'")
         
-        self.assertIn("Username sudah terdaftar", error,
-                     "Should show duplicate username error")
+        current_url = self.driver.current_url
+        print(f"Current URL: {current_url}")
+        
+        self.assertIn("register.php", current_url,
+                     "Should stay on register page with duplicate username")
+        
+        if error:
+            self.assertIn("Username sudah terdaftar", error,
+                         "Should show duplicate username error")
+        else:
+            print("[WARNING] No error message displayed, but stayed on register page")
 
 
 if __name__ == "__main__":

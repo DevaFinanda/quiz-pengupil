@@ -7,7 +7,7 @@ class TestLoginValidCredentials(BaseTest):
         print("\n[TC-LOG-001] Testing: Login dengan Kredensial Valid")
         
         self.navigate_to_login()
-        self.fill_login_form(username="irul", password="12345")
+        self.fill_login_form(username="testuser_login", password="Test@123")
         
         self.submit_login_form()
         
