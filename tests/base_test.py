@@ -16,13 +16,13 @@ import os
 
 
 class BaseTest(unittest.TestCase):
-    """Base class untuk semua test cases"""
     
     BASE_URL = os.getenv('BASE_URL', 'http://localhost/quiz-pengupil')
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_USER = os.getenv('DB_USER', 'root')
     DB_PASS = os.getenv('DB_PASS', '')
     DB_NAME = os.getenv('DB_NAME', 'quiz_pengupil')
+    SCREENSHOT_DIR = os.path.join(os.path.dirname(__file__), 'screenshots')
     
     @classmethod
     def setUpClass(cls):
@@ -56,7 +56,16 @@ class BaseTest(unittest.TestCase):
         """Cleanup setelah setiap test"""
         pass
     
-    # ==================== DATABASE HELPERS ====================
+    def take_screenshot(self, test_name):
+        if not os.path.exists(self.SCREENSHOT_DIR):
+            os.makedirs(self.SCREENSHOT_DIR)
+        
+        filename = f"{test_name}.png"
+        filepath = os.path.join(self.SCREENSHOT_DIR, filename)
+        
+        self.driver.save_screenshot(filepath)
+        print(f"[INFO] Screenshot saved: screenshots/{filename}")
+        return filepath
     
     def get_db_connection(self):
         """Database connection helper"""

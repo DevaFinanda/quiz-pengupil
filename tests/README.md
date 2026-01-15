@@ -1,70 +1,62 @@
-# Quiz Pengupil - Test Suite
+# Quiz Pengupil Test Suite
 
-## Test Cases (28 Tests Total)
+Automated testing untuk aplikasi Quiz Pengupil menggunakan Selenium WebDriver dan PyMySQL.
 
-### Register Tests (15 tests)
-- `test_reg_001_valid_data.py` - Register dengan data valid (detects BUG)
-- `test_reg_002_password_mismatch.py` - Password tidak sama
-- `test_reg_003_all_empty.py` - Semua field kosong
-- `test_reg_004_name_empty.py` - Name kosong
-- `test_reg_005_email_empty.py` - Email kosong
-- `test_reg_006_username_empty.py` - Username kosong
-- `test_reg_007_password_empty.py` - Password kosong
-- `test_reg_008_repassword_empty.py` - Re-password kosong
-- `test_reg_009_duplicate_username.py` - Username sudah terdaftar
-- `test_reg_010_invalid_email.py` - Email format invalid
-- `test_reg_011_email_no_domain.py` - Email tanpa domain
-- `test_reg_012_username_with_space.py` - Username dengan spasi
-- `test_reg_013_username_special_chars.py` - Username dengan special characters
-- `test_reg_014_short_password.py` - Password terlalu pendek
-- `test_reg_015_sql_injection_username.py` - SQL injection di username
+## Test Coverage
 
-### Login Tests (13 tests)
-- `test_log_001_valid_credentials.py` - Login dengan kredensial valid
-- `test_log_002_wrong_password.py` - Password salah
-- `test_log_003_nonexistent_user.py` - User tidak terdaftar (misleading error)
-- `test_log_004_all_empty.py` - Semua field kosong
-- `test_log_005_username_empty.py` - Username kosong
-- `test_log_006_password_empty.py` - Password kosong
-- `test_log_007_username_whitespace.py` - Username hanya spasi
-- `test_log_008_sql_injection_username.py` - SQL injection di username
-- `test_log_009_sql_injection_password.py` - SQL injection di password
-- `test_log_010_xss_username.py` - XSS attack di username
-- `test_log_011_case_sensitivity.py` - Case sensitivity test
-- `test_log_012_long_username.py` - Username sangat panjang
-- `test_log_013_special_chars_password.py` - Password dengan special characters
+### Register Module (7 test cases)
+- TC-REG-001: Register dengan data valid (bug detection: field name empty)
+- TC-REG-002: Register dengan password mismatch
+- TC-REG-003: Register dengan semua field kosong
+- TC-REG-004: Register dengan field name kosong
+- TC-REG-009: Register dengan username duplikat
+- TC-REG-010: Register dengan email format invalid
+- TC-REG-015: Register dengan SQL injection attempt
 
-## Running Tests
+### Login Module (7 test cases)
+- TC-LOG-001: Login dengan kredensial valid
+- TC-LOG-002: Login dengan password salah
+- TC-LOG-003: Login dengan user tidak ada
+- TC-LOG-004: Login dengan semua field kosong
+- TC-LOG-008: Login dengan SQL injection di username
+- TC-LOG-009: Login dengan SQL injection di password
+- TC-LOG-010: Login dengan XSS attempt di username
 
-### Install Dependencies
+## Requirements
+
+```
+selenium==4.17.2
+pymysql==1.1.0
+bcrypt==4.1.2
+webdriver-manager==4.0.1
+```
+
+## Installation
+
 ```bash
 cd tests
 pip install -r requirements.txt
 ```
 
-### Run All Tests
+## Running Tests
+
+Run all tests:
 ```bash
 python run_all_tests.py
 ```
 
-### Run Single Test
+Run specific test:
 ```bash
 python test_reg_001_valid_data.py
-python test_log_001_valid_credentials.py
 ```
 
-### Run Specific Category
-```bash
-# Register tests only
-python -m unittest discover -s . -p "test_reg_*.py" -v
+## Screenshots
 
-# Login tests only
-python -m unittest discover -s . -p "test_log_*.py" -v
-```
+Test screenshots disimpan di folder `screenshots/` dengan format nama:
+- `test_reg_001_valid_data.png`
+- `test_log_001_valid_credentials.png`
+- etc.
 
 ## CI/CD
-Tests run automatically via GitHub Actions on push/PR to main/develop branches.
 
-## Known Issues
-🐛 **BUG-001**: Field 'name' empty in database (register.php line 35)
-⚠️ **ISSUE-001**: Misleading error message in login (login.php line 32)
+GitHub Actions workflow: `.github/workflows/main.yml`
