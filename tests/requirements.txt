@@ -1,0 +1,16 @@
+# Dependencies untuk Test Suite Quiz Pengupil
+
+# Selenium WebDriver untuk browser automation
+selenium==4.17.2
+
+# PyMySQL untuk database verification (stub/driver)
+pymysql==1.1.0
+
+# WebDriver Manager untuk auto-download ChromeDriver
+webdriver-manager==4.0.1
+
+# Python dotenv untuk environment variables (optional)
+python-dotenv==1.0.0
+
+# bcrypt untuk password hashing (create test users)
+bcrypt==4.1.2

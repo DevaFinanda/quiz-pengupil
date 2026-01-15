@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: quiz-pengupil-web
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - quiz-network
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=quiz_pengupil
+
+  db:
+    image: mysql:8.0
+    container_name: quiz-pengupil-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: quiz_pengupil
+    volumes:
+      - ./db/quiz_pengupil.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-data:/var/lib/mysql
+    networks:
+      - quiz-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: quiz-pengupil-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db
+    networks:
+      - quiz-network
+
+volumes:
+  db-data:
+
+networks:
+  quiz-network:
+    driver: bridge

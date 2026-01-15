@@ -1,0 +1,115 @@
+name: Quiz Pengupil - Automated Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: quiz_pengupil
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mysqli, pdo_mysql
+        coverage: none
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@latest
+    
+    - name: Install ChromeDriver
+      uses: nanasess/setup-chromedriver@master
+    
+    - name: Check Chrome and ChromeDriver versions
+      run: |
+        google-chrome --version
+        chromedriver --version
+    
+    - name: Install Python dependencies
+      run: |
+        cd tests
+        pip install -r requirements.txt
+    
+    - name: Import database
+      run: |
+        mysql -h 127.0.0.1 -uroot -proot quiz_pengupil < db/quiz_pengupil.sql
+    
+    - name: Update koneksi.php for CI
+      run: |
+        cat > koneksi.php << 'EOF'
+        <?php
+            $host     = '127.0.0.1';
+            $user     = 'root'; 
+            $password = 'root';                  
+            $db       = 'quiz_pengupil';
+
+            $con = mysqli_connect($host, $user, $password, $db);
+            if (!$con) { 
+                die("Connection failed: " . mysqli_connect_error());    
+            }
+        ?>
+        EOF
+    
+    - name: Start PHP built-in server
+      run: |
+        php -S localhost:8000 -t . &
+        sleep 3
+      working-directory: ${{ github.workspace }}
+    
+    - name: Wait for server to be ready
+      run: |
+        timeout 30 bash -c 'until curl -f http://localhost:8000/login.php; do sleep 1; done'
+    
+    - name: Run Selenium tests
+      env:
+        BASE_URL: http://localhost:8000
+        DB_HOST: 127.0.0.1
+        DB_USER: root
+        DB_PASS: root
+        DB_NAME: quiz_pengupil
+        CI: true
+      run: |
+        cd tests
+        python -m pytest test_*.py -v --tb=short || python -m unittest discover -s . -p "test_*.py" -v
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: tests/*.log
+        if-no-files-found: ignore
+    
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "### Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Tests completed. Check logs for details." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Known Issues:**" >> $GITHUB_STEP_SUMMARY
+        echo "- TC-REG-001 may fail due to bug in register.php (variable \$nama vs \$name)" >> $GITHUB_STEP_SUMMARY
+        echo "- TC-LOG-003 shows misleading error message" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,32 @@
+# Docker ignore untuk mengurangi ukuran image
+
+# Tests
+tests/
+*.pyc
+__pycache__/
+
+# Git
+.git/
+.github/
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Environment files
+.env
+.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (tidak perlu di-copy ke image)
+Dockerfile
+docker-compose.yml
+.dockerignore
