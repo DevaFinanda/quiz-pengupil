@@ -29,7 +29,7 @@ if( isset($_POST['submit']) ){
         $repass   = mysqli_real_escape_string($con, $repass);
         if(!empty(trim($name)) && !empty(trim($username)) && !empty(trim($email)) && !empty(trim($password)) && !empty(trim($repass))){
             if($password == $repass){
-                if( cek_nama($name,$con) == 0 ){
+                if( cek_nama($username,$con) == 0 ){
                     $pass  = password_hash($password, PASSWORD_DEFAULT);
                     $query = "INSERT INTO users (username,name,email, password ) VALUES ('$username','$name','$email','$pass')";
                     $result   = mysqli_query($con, $query);
